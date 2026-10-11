@@ -58,12 +58,12 @@ Käivitamine
 
 GitHub koostöö
 
-Issue: [Lisa link]
+Issue: https://github.com/67-Nikita-67/CrazyZoo/issues/1
 
-Pull Request: [Lisa link]
+Pull Request: https://github.com/67-Nikita-67/CrazyZoo/pull/2
 
-Code Review: [Lisa kirjeldus]
+Code Review: Kontrollisin iseseisvalt Elephant klassi pärimist, ISwimmable liidese kasutamist, CrazyAction meetodit ja WPF kasutajaliidese muudatusi. Lisasin Pull Request'i juurde kontrollimise kommentaari.
+GitHubi töövoog viidi läbi iseseisvalt.
 
 AI kasutamine
-
 Kasutasin ChatGPT-d C# ja WPF mõistete selgitamiseks ning näidiskoodi koostamiseks. Kontrollisin koodi ja tegin vajalikud parandused.
