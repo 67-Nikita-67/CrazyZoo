@@ -25,6 +25,7 @@ public partial class MainWindow : Window
         _animals.Add(new Penguin("Pingu"));
         _animals.Add(new Lion("Simba"));
         _animals.Add(new Parrot("Kesha"));
+        _animals.Add(new Elephant("Dumbo"));
 
         AnimalList.SelectedIndex = 0;
 
@@ -171,6 +172,10 @@ public partial class MainWindow : Window
             case "Parrot":
                 animal = new Parrot(name);
                 break;
+
+            case "Elephant":
+                animal = new Elephant(name);
+                break; 
 
             default:
                 AddLog("Unknown animal species!");

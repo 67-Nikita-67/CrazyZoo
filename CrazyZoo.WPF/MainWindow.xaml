@@ -81,6 +81,7 @@
                                     <ComboBoxItem Content="Penguin"/>
                                     <ComboBoxItem Content="Lion"/>
                                     <ComboBoxItem Content="Parrot"/>
+                                    <ComboBoxItem Content="Elephant"/>
                                 </ComboBox>
 
                                 <TextBox x:Name="NewAnimalName"
