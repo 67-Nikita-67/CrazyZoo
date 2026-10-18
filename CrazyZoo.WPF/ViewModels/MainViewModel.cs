@@ -11,13 +11,41 @@ namespace CrazyZoo.WPF.ViewModels;
 
 public class MainViewModel : BaseViewModel
 {
-    private readonly Repository<Animal> _repository = new();
+    private readonly Repository<Animal> _zooA = new();
+    private readonly Repository<Animal> _zooB = new();
+    private readonly Repository<Animal> _zooC = new();
 
     public ObservableCollection<Animal> Animals { get; } = new();
     public ObservableCollection<string> Logs { get; } = new();
     public ObservableCollection<string> LinqResults { get; } = new();
 
+    public ObservableCollection<string> RepositoryNames { get; } =
+        new() { "Zoo A", "Zoo B", "Zoo C" };
+
+    private string _selectedRepositoryName = "Zoo A";
+
+    public string SelectedRepositoryName
+    {
+        get => _selectedRepositoryName;
+        set
+        {
+            if (SetProperty(ref _selectedRepositoryName, value))
+            {
+                LoadSelectedRepository();
+            }
+        }
+    }
+
+    private Repository<Animal> CurrentRepository =>
+        SelectedRepositoryName switch
+        {
+            "Zoo B" => _zooB,
+            "Zoo C" => _zooC,
+            _ => _zooA
+        };
+
     private Animal? _selectedAnimal;
+
     public Animal? SelectedAnimal
     {
         get => _selectedAnimal;
@@ -29,6 +57,7 @@ public class MainViewModel : BaseViewModel
     }
 
     private string _newAnimalName = "";
+
     public string NewAnimalName
     {
         get => _newAnimalName;
@@ -36,6 +65,7 @@ public class MainViewModel : BaseViewModel
     }
 
     private string _renameText = "";
+
     public string RenameText
     {
         get => _renameText;
@@ -43,6 +73,7 @@ public class MainViewModel : BaseViewModel
     }
 
     private string _selectedSpecies = "Monkey";
+
     public string SelectedSpecies
     {
         get => _selectedSpecies;
@@ -50,12 +81,12 @@ public class MainViewModel : BaseViewModel
     }
 
     private string _searchText = "";
+
     public string SearchText
     {
         get => _searchText;
         set => SetProperty(ref _searchText, value);
     }
-
     public ICommand AddCommand { get; }
     public ICommand RemoveCommand { get; }
     public ICommand EatCommand { get; }
@@ -136,8 +167,22 @@ public class MainViewModel : BaseViewModel
 
     private void AddInitialAnimal(Animal animal)
     {
-        _repository.Add(animal);
+        _zooA.Add(animal);
         Animals.Add(animal);
+    }
+
+    private void LoadSelectedRepository()
+    {
+        Animals.Clear();
+
+        foreach (Animal animal in CurrentRepository.GetAll())
+            Animals.Add(animal);
+
+        SelectedAnimal = Animals.FirstOrDefault();
+
+        LinqResults.Clear();
+
+        AddLog($"Switched to {SelectedRepositoryName}");
     }
 
     private ICommand CreateAnimalCommand(
@@ -158,6 +203,9 @@ public class MainViewModel : BaseViewModel
         {
             Animal animal = SelectedSpecies switch
             {
+                "Giraffe" => new Giraffe(NewAnimalName),
+                "Crocodile" => new Crocodile(NewAnimalName),
+                "Kangaroo" => new Kangaroo(NewAnimalName),
                 "Monkey" => new Monkey(NewAnimalName),
                 "Penguin" => new Penguin(NewAnimalName),
                 "Lion" => new Lion(NewAnimalName),
@@ -167,9 +215,9 @@ public class MainViewModel : BaseViewModel
                     "Unknown species!")
             };
 
-            int previousLogCount = _repository.Logs.Count();
+            int previousLogCount = CurrentRepository.Logs.Count();
 
-            _repository.Add(animal);
+            CurrentRepository.Add(animal);
             Animals.Add(animal);
 
             CopyRepositoryLogs(previousLogCount);
@@ -182,19 +230,21 @@ public class MainViewModel : BaseViewModel
             AddLog($"Error: {ex.Message}");
         }
     }
-
     private void RemoveAnimal()
     {
         if (SelectedAnimal == null)
             return;
 
         Animal animal = SelectedAnimal;
-        int previousLogCount = _repository.Logs.Count();
 
-        if (_repository.Remove(animal))
+        int previousLogCount = CurrentRepository.Logs.Count();
+
+        if (CurrentRepository.Remove(animal))
         {
             Animals.Remove(animal);
+
             CopyRepositoryLogs(previousLogCount);
+
             SelectedAnimal = Animals.FirstOrDefault();
         }
     }
@@ -204,9 +254,9 @@ public class MainViewModel : BaseViewModel
         if (SelectedAnimal == null)
             return;
 
-        int previousLogCount = _repository.Logs.Count();
+        int previousLogCount = CurrentRepository.Logs.Count();
 
-        _repository.PerformCrazyAction(SelectedAnimal);
+        CurrentRepository.PerformCrazyAction(SelectedAnimal);
 
         CopyRepositoryLogs(previousLogCount);
     }
@@ -233,8 +283,11 @@ public class MainViewModel : BaseViewModel
 
     private void CopyRepositoryLogs(int startIndex)
     {
-        foreach (string message in _repository.Logs.Skip(startIndex))
+        foreach (string message in
+                 CurrentRepository.Logs.Skip(startIndex))
+        {
             AddLog(message);
+        }
     }
 
     private void AddLog(string message)
@@ -269,7 +322,7 @@ public class MainViewModel : BaseViewModel
     {
         LinqResults.Clear();
 
-        var animals = _repository.FindByName(SearchText);
+        var animals = CurrentRepository.FindByName(SearchText);
 
         foreach (var animal in animals)
         {
@@ -284,7 +337,7 @@ public class MainViewModel : BaseViewModel
     {
         LinqResults.Clear();
 
-        var animals = _repository.SortByEnergy();
+        var animals = CurrentRepository.SortByEnergy();
 
         foreach (var animal in animals)
         {
@@ -296,7 +349,7 @@ public class MainViewModel : BaseViewModel
     {
         LinqResults.Clear();
 
-        var groups = _repository.GroupBySpecies();
+        var groups = CurrentRepository.GroupBySpecies();
 
         foreach (var group in groups)
         {
