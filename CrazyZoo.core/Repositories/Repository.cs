@@ -1,4 +1,5 @@
-﻿using CrazyZoo.Core.Models;
+﻿using CrazyZoo.Core.Interfaces;
+using CrazyZoo.Core.Models;
 using CrazyZoo.Сore.Events;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Linq;
 
 namespace CrazyZoo.Core.Repositories;
 
-public class Repository<T> where T : Animal
+public class Repository<T> : IRepository<T> where T : Animal
 {
     private readonly List<T> items = new();
     private readonly List<string> logs = new();
