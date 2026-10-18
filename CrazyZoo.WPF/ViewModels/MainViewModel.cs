@@ -15,6 +15,15 @@ public class MainViewModel : BaseViewModel
     private readonly Repository<Animal> _zooB = new();
     private readonly Repository<Animal> _zooC = new();
 
+    private readonly Repository<Monkey> _monkeys = new();
+    private readonly Repository<Penguin> _penguins = new();
+    private readonly Repository<Lion> _lions = new();
+    private readonly Repository<Parrot> _parrots = new();
+    private readonly Repository<Elephant> _elephants = new();
+    private readonly Repository<Giraffe> _giraffes = new();
+    private readonly Repository<Crocodile> _crocodiles = new();
+    private readonly Repository<Kangaroo> _kangaroos = new();
+
     public ObservableCollection<Animal> Animals { get; } = new();
     public ObservableCollection<string> Logs { get; } = new();
     public ObservableCollection<string> LinqResults { get; } = new();
@@ -30,9 +39,7 @@ public class MainViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _selectedRepositoryName, value))
-            {
                 LoadSelectedRepository();
-            }
         }
     }
 
@@ -87,6 +94,7 @@ public class MainViewModel : BaseViewModel
         get => _searchText;
         set => SetProperty(ref _searchText, value);
     }
+
     public ICommand AddCommand { get; }
     public ICommand RemoveCommand { get; }
     public ICommand EatCommand { get; }
@@ -99,7 +107,6 @@ public class MainViewModel : BaseViewModel
     public ICommand TalkCommand { get; }
     public ICommand RenameCommand { get; }
     public ICommand ClearLogCommand { get; }
-
     public ICommand SearchCommand { get; }
     public ICommand SortCommand { get; }
     public ICommand GroupCommand { get; }
@@ -161,7 +168,6 @@ public class MainViewModel : BaseViewModel
         AddInitialAnimal(new Elephant("Dumbo"));
 
         SelectedAnimal = Animals.FirstOrDefault();
-
         AddLog("Welcome to Crazy Zoo!");
     }
 
@@ -169,6 +175,37 @@ public class MainViewModel : BaseViewModel
     {
         _zooA.Add(animal);
         Animals.Add(animal);
+        AddToTypeRepository(animal);
+    }
+
+    private void AddToTypeRepository(Animal animal)
+    {
+        switch (animal)
+        {
+            case Monkey a: _monkeys.Add(a); break;
+            case Penguin a: _penguins.Add(a); break;
+            case Lion a: _lions.Add(a); break;
+            case Parrot a: _parrots.Add(a); break;
+            case Elephant a: _elephants.Add(a); break;
+            case Giraffe a: _giraffes.Add(a); break;
+            case Crocodile a: _crocodiles.Add(a); break;
+            case Kangaroo a: _kangaroos.Add(a); break;
+        }
+    }
+
+    private void RemoveFromTypeRepository(Animal animal)
+    {
+        switch (animal)
+        {
+            case Monkey a: _monkeys.Remove(a); break;
+            case Penguin a: _penguins.Remove(a); break;
+            case Lion a: _lions.Remove(a); break;
+            case Parrot a: _parrots.Remove(a); break;
+            case Elephant a: _elephants.Remove(a); break;
+            case Giraffe a: _giraffes.Remove(a); break;
+            case Crocodile a: _crocodiles.Remove(a); break;
+            case Kangaroo a: _kangaroos.Remove(a); break;
+        }
     }
 
     private void LoadSelectedRepository()
@@ -179,7 +216,6 @@ public class MainViewModel : BaseViewModel
             Animals.Add(animal);
 
         SelectedAnimal = Animals.FirstOrDefault();
-
         LinqResults.Clear();
 
         AddLog($"Switched to {SelectedRepositoryName}");
@@ -211,16 +247,16 @@ public class MainViewModel : BaseViewModel
                 "Lion" => new Lion(NewAnimalName),
                 "Parrot" => new Parrot(NewAnimalName),
                 "Elephant" => new Elephant(NewAnimalName),
-                _ => throw new ArgumentException(
-                    "Unknown species!")
+                _ => throw new ArgumentException("Unknown species!")
             };
 
             int previousLogCount = CurrentRepository.Logs.Count();
 
             CurrentRepository.Add(animal);
             Animals.Add(animal);
-
             CopyRepositoryLogs(previousLogCount);
+
+            AddToTypeRepository(animal);
 
             SelectedAnimal = animal;
             NewAnimalName = "";
@@ -230,20 +266,21 @@ public class MainViewModel : BaseViewModel
             AddLog($"Error: {ex.Message}");
         }
     }
+
     private void RemoveAnimal()
     {
         if (SelectedAnimal == null)
             return;
 
         Animal animal = SelectedAnimal;
-
         int previousLogCount = CurrentRepository.Logs.Count();
 
         if (CurrentRepository.Remove(animal))
         {
             Animals.Remove(animal);
-
             CopyRepositoryLogs(previousLogCount);
+
+            RemoveFromTypeRepository(animal);
 
             SelectedAnimal = Animals.FirstOrDefault();
         }
@@ -257,7 +294,6 @@ public class MainViewModel : BaseViewModel
         int previousLogCount = CurrentRepository.Logs.Count();
 
         CurrentRepository.PerformCrazyAction(SelectedAnimal);
-
         CopyRepositoryLogs(previousLogCount);
     }
 
@@ -270,9 +306,7 @@ public class MainViewModel : BaseViewModel
 
         if (SelectedAnimal.Rename(RenameText))
         {
-            AddLog(
-                $"{oldName} was renamed to {SelectedAnimal.Name}.");
-
+            AddLog($"{oldName} was renamed to {SelectedAnimal.Name}.");
             RenameText = "";
         }
         else
@@ -318,6 +352,7 @@ public class MainViewModel : BaseViewModel
                 relay.RaiseCanExecuteChanged();
         }
     }
+
     private void SearchAnimals()
     {
         LinqResults.Clear();
@@ -333,6 +368,7 @@ public class MainViewModel : BaseViewModel
         if (LinqResults.Count == 0)
             LinqResults.Add("No animals found.");
     }
+
     private void SortAnimals()
     {
         LinqResults.Clear();
@@ -345,6 +381,7 @@ public class MainViewModel : BaseViewModel
                 $"{animal.DisplayName} | Energy: {animal.Energy}");
         }
     }
+
     private void GroupAnimals()
     {
         LinqResults.Clear();
@@ -353,13 +390,11 @@ public class MainViewModel : BaseViewModel
 
         foreach (var group in groups)
         {
-            LinqResults.Add(
-                $"{group.Key} ({group.Count()}):");
+            LinqResults.Add($"{group.Key} ({group.Count()}):");
 
             foreach (var animal in group)
             {
-                LinqResults.Add(
-                    $"    {animal.DisplayName}");
+                LinqResults.Add($"    {animal.DisplayName}");
             }
         }
     }
