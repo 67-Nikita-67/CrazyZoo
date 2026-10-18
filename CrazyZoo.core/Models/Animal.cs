@@ -108,6 +108,24 @@ public abstract class Animal : INotifyPropertyChanged
     public abstract string MakeSound();
 
     public abstract string CrazyAction();
+    public virtual string ReactToAdded(Animal newcomer)
+    {
+        ChangeHappiness(5);
+        return $"{Name} welcome {newcomer.Name}! Happiness: {Happiness}";
+    }
+
+    public virtual string ReactToRemoved(Animal leaving)
+    {
+        ChangeHappiness(-3);
+        return $"{Name} says goodbye to {leaving.Name}! Happiness: {Happiness}";
+    }
+
+    public virtual string ReactToCrazyAction(Animal actor)
+    {
+        ChangeHappiness(2);
+        return $"{Name} reacts to {actor.Name} s crazy action! Happiness: {Happiness}";
+    }
+
 
     protected void OnPropertyChanged(
         [CallerMemberName] string? propertyName = null)
