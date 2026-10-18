@@ -71,10 +71,25 @@
                               Margin="5">
                         <DockPanel Margin="8">
 
+                            <StackPanel DockPanel.Dock="Top"
+                             Margin="0,0,0,10">
+
+                                <TextBlock Text="Select Repository:"
+                             FontWeight="Bold"
+                             Margin="4"/>
+
+                                <ComboBox ItemsSource="{Binding RepositoryNames}"
+                             SelectedItem="{Binding SelectedRepositoryName, Mode=TwoWay}"
+                             Margin="4"/>
+
+                            </StackPanel>
+
+
                             <StackPanel DockPanel.Dock="Bottom"
                                         Margin="0,10,0,0">
 
-                                <ComboBox x:Name="SpeciesCombo"
+                                <ComboBox SelectedValuePath="Content"
+                                          SelectedValue="{Binding SelectedSpecies, Mode=TwoWay}"
                                           SelectedIndex="0"
                                           Margin="4">
                                     <ComboBoxItem Content="Monkey"/>
@@ -82,21 +97,31 @@
                                     <ComboBoxItem Content="Lion"/>
                                     <ComboBoxItem Content="Parrot"/>
                                     <ComboBoxItem Content="Elephant"/>
+                                    <ComboBoxItem Content="Giraffe"/>
+                                    <ComboBoxItem Content="Crocodile"/>
+                                    <ComboBoxItem Content="Kangaroo"/>
                                 </ComboBox>
 
-                                <TextBox x:Name="NewAnimalName"
+                                <TextBox Text="{Binding NewAnimalName, UpdateSourceTrigger=PropertyChanged}"
                                          Margin="4"
                                          Padding="8"
                                          MaxLength="20"
                                          ToolTip="Enter animal name"/>
 
                                 <Button Content="Add Animal"
-                                        Click="AddAnimal_Click"/>
+                                        Command="{Binding AddCommand}"/>
+
+                                <Button Content="Remove Animal"
+                                        Command="{Binding RemoveCommand}"
+                                        Background="#FECACA"/>
+
                             </StackPanel>
 
                             <ListBox x:Name="AnimalList"
-                                     ItemTemplate="{StaticResource AnimalTemplate}"
-                                     SelectionChanged="AnimalList_SelectionChanged"/>
+                                     ItemsSource="{Binding Animals}"
+                                     SelectedItem="{Binding SelectedAnimal, Mode=TwoWay}"
+                                     ItemTemplate="{StaticResource AnimalTemplate}"/>
+
                         </DockPanel>
                     </GroupBox>
 
@@ -107,7 +132,7 @@
 
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel Margin="15"
-                                        DataContext="{Binding SelectedItem, ElementName=AnimalList}">
+                                        DataContext="{Binding SelectedAnimal}">
 
                                 <TextBlock Text="{Binding DisplayName, TargetNullValue=Select an animal}"
                                            FontSize="25"
@@ -143,35 +168,58 @@
                                            Margin="0,20,0,8"/>
 
                                 <WrapPanel>
+
                                     <Button Content="Eat"
-                                            Click="Eat_Click"/>
+                                            Command="{Binding DataContext.EatCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"/>
+
                                     <Button Content="Rest"
-                                            Click="Rest_Click"/>
+                                            Command="{Binding DataContext.RestCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"/>
+
                                     <Button Content="Sound"
-                                            Click="Sound_Click"/>
+                                            Command="{Binding DataContext.SoundCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"/>
+
                                     <Button Content="Swim"
-                                            Click="Swim_Click"/>
+                                            Command="{Binding DataContext.SwimCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"/>
+
                                     <Button Content="Climb"
-                                            Click="Climb_Click"/>
+                                            Command="{Binding DataContext.ClimbCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"/>
+
                                     <Button Content="Fly"
-                                            Click="Fly_Click"/>
+                                            Command="{Binding DataContext.FlyCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"/>
+
                                     <Button Content="Talk"
-                                            Click="Talk_Click"/>
+                                            Command="{Binding DataContext.TalkCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"/>
+
                                     <Button Content="Crazy Action!"
                                             Background="#FACC15"
-                                            Click="CrazyAction_Click"/>
+                                            Command="{Binding DataContext.CrazyCommand,
+                                                RelativeSource={RelativeSource AncestorType=Window}}"/>
+
                                 </WrapPanel>
 
                                 <Expander Header="Rename Animal"
                                           Margin="0,15,0,0"
                                           Padding="5">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBox x:Name="RenameTextBox"
-                                                 Width="180"
+
+                                        <TextBox Width="180"
                                                  MaxLength="20"
-                                                 Padding="7"/>
+                                                 Padding="7"
+                                                 Text="{Binding DataContext.RenameText,
+                                                     RelativeSource={RelativeSource AncestorType=Window},
+                                                     UpdateSourceTrigger=PropertyChanged}"/>
+
                                         <Button Content="Rename"
-                                                Click="Rename_Click"/>
+                                                Command="{Binding DataContext.RenameCommand,
+                                                    RelativeSource={RelativeSource AncestorType=Window}}"/>
+
                                     </StackPanel>
                                 </Expander>
 
@@ -186,20 +234,101 @@
                               Margin="5">
 
                         <DockPanel Margin="8">
+
                             <Button Content="Clear Log"
                                     DockPanel.Dock="Bottom"
                                     HorizontalAlignment="Right"
-                                    Click="ClearLog_Click"/>
+                                    Command="{Binding ClearLogCommand}"/>
 
-                            <ListBox x:Name="LogList"/>
+                            <ListBox x:Name="LogList"
+                                     ItemsSource="{Binding Logs}"/>
+
                         </DockPanel>
+                    </GroupBox>
+
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="LINQ Explorer">
+                <Grid Margin="20">
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0">
+
+                        <TextBlock Text="LINQ Animal Explorer"
+                       FontSize="26"
+                       FontWeight="Bold"
+                       Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Search, sort and group your animals using LINQ!"
+                       FontSize="14"
+                       Foreground="Gray"
+                       Margin="0,0,0,20"/>
+
+                        <GroupBox Header="Search Animals"
+                      Margin="0,0,0,15">
+
+                            <StackPanel Margin="10">
+
+                                <TextBlock Text="Enter animal name:"
+                               Margin="0,0,0,5"/>
+
+                                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             Padding="10"
+                             FontSize="15"
+                             Margin="0,0,0,10"/>
+
+                                <Button Content="Search by Name"
+                            Command="{Binding SearchCommand}"
+                            Background="#BFDBFE"
+                            HorizontalAlignment="Left"/>
+
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="Sort and Group"
+                      Margin="0,0,0,15">
+
+                            <StackPanel Margin="10">
+
+                                <WrapPanel>
+
+                                    <Button Content="Sort by Energy"
+                                Command="{Binding SortCommand}"
+                                Background="#BBF7D0"/>
+
+                                    <Button Content="Group by Species"
+                                Command="{Binding GroupCommand}"
+                                Background="#FDE68A"/>
+
+                                </WrapPanel>
+
+                            </StackPanel>
+                        </GroupBox>
+
+                    </StackPanel>
+
+                    <GroupBox Header="LINQ Results"
+                  Grid.Row="1"
+                  Margin="0,10,0,0">
+
+                        <ListBox ItemsSource="{Binding LinqResults}"
+                     FontSize="15"
+                     Padding="10"
+                     Background="White"/>
 
                     </GroupBox>
+
                 </Grid>
             </TabItem>
 
             <TabItem Header="About">
                 <StackPanel Margin="25">
+
                     <TextBlock Text="Crazy Zoo"
                                FontSize="28"
                                FontWeight="Bold"/>
@@ -213,11 +342,12 @@
 
                     <TextBlock Margin="10"
                                TextWrapping="Wrap"
-                               Text="Abstract classes, constructors, inheritance, interfaces, polymorphism, validation, Observableсollection, Datatemplate, ProgressBar, Expander and TabControl."/>
+                               Text="Abstract classes, inheritance, interfaces, polymorphism, generic repositories, events, LINQ, MVVM, ICommand, ObservableCollection, DataTemplate, ProgressBar, Expander and TabControl."/>
 
                     <TextBlock Text="Every animal has its own CrazyAction!"
                                FontWeight="Bold"
                                Margin="0,20,0,0"/>
+
                 </StackPanel>
             </TabItem>
 
